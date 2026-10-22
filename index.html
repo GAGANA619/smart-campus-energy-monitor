@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Energy Monitoring System</title>
+
+```
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 30px;
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    header {
+        background: #123b5d;
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+    }
+
+    .building-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .building-card {
+        background: white;
+        padding: 22px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .building-card h2 {
+        color: #123b5d;
+    }
+
+    .consumption {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 15px 0;
+    }
+
+    .warning {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 12px;
+        margin-top: 15px;
+        border-left: 5px solid #dc2626;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .normal {
+        background: #dcfce7;
+        color: #166534;
+        padding: 12px;
+        margin-top: 15px;
+        border-left: 5px solid #16a34a;
+        border-radius: 5px;
+    }
+
+    .target {
+        color: #475569;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+<header>
+    <h1>Smart Campus Energy Monitoring System</h1>
+    <p>Daily electricity consumption and energy-saving targets</p>
+    <p>Maximum permitted daily consumption: 100 kWh per building</p>
+</header>
+
+<main>
+    <section class="building-container" id="buildingContainer"></section>
+</main>
+
+<script>
+    const buildings = [
+        {
+            name: "Academic Block A",
+            consumption: 120,
+            target: 110
+        },
+        {
+            name: "Library",
+            consumption: 85,
+            target: 90
+        },
+        {
+            name: "Laboratory Block",
+            consumption: 150,
+            target: 130
+        }
+    ];
+
+    const container = document.getElementById("buildingContainer");
+
+    buildings.forEach(building => {
+        const exceedsLimit = building.consumption > 100;
+
+        const status = exceedsLimit
+            ? `<div class="warning">
+                   WARNING! Daily consumption exceeds the limit
+                   by ${building.consumption - 100} kWh.
+               </div>`
+            : `<div class="normal">
+                   Consumption is within the permitted limit.
+               </div>`;
+
+        const card = document.createElement("article");
+        card.className = "building-card";
+
+        card.innerHTML = `
+            <h2>${building.name}</h2>
+            <p>Daily Electricity Consumption</p>
+            <div class="consumption">${building.consumption} kWh</div>
+            <p class="target">
+                Energy-Saving Target: ${building.target} kWh/day
+            </p>
+            ${status}
+        `;
+
+        container.appendChild(card);
+    });
+</script>
+
+</body>
+</html>
