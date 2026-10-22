@@ -28,6 +28,32 @@
         margin-bottom: 25px;
     }
 
+    .summary-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 22px;
+        border-radius: 12px;
+        border-left: 5px solid #0284c7;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .summary-card h2 {
+        font-size: 17px;
+        color: #475569;
+    }
+
+    .summary-value {
+        font-size: 26px;
+        font-weight: bold;
+        color: #123b5d;
+    }
+
     .building-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -51,6 +77,10 @@
         margin: 15px 0;
     }
 
+    .target {
+        color: #475569;
+    }
+
     .warning {
         background: #fee2e2;
         color: #991b1b;
@@ -69,10 +99,6 @@
         border-left: 5px solid #16a34a;
         border-radius: 5px;
     }
-
-    .target {
-        color: #475569;
-    }
 </style>
 ```
 
@@ -82,12 +108,32 @@
 
 <header>
     <h1>Smart Campus Energy Monitoring System</h1>
-    <p>Daily electricity consumption and energy-saving targets</p>
-    <p>Maximum permitted daily consumption: 100 kWh per building</p>
+    <p>Campus electricity consumption and energy-saving performance</p>
+    <p>Daily warning threshold: 100 kWh per building</p>
 </header>
 
 <main>
-    <section class="building-container" id="buildingContainer"></section>
+
+```
+<section class="summary-container">
+
+    <article class="summary-card">
+        <h2>Total Campus Consumption</h2>
+        <div class="summary-value" id="totalConsumption">0</div>
+        <p>Combined daily energy usage</p>
+    </article>
+
+    <article class="summary-card">
+        <h2>Highest Energy Usage</h2>
+        <div class="summary-value" id="highestBuilding">Loading...</div>
+        <p id="highestConsumption"></p>
+    </article>
+
+</section>
+
+<section class="building-container" id="buildingContainer"></section>
+```
+
 </main>
 
 <script>
@@ -109,19 +155,50 @@
         }
     ];
 
+    const totalConsumption = buildings.reduce(
+        (total, building) => total + building.consumption,
+        0
+    );
+
+    const highestBuilding = buildings.reduce(
+        (highest, building) =>
+            building.consumption > highest.consumption
+                ? building
+                : highest
+    );
+
+    document.getElementById("totalConsumption").textContent =
+        `${totalConsumption} kWh/day`;
+
+    document.getElementById("highestBuilding").textContent =
+        highestBuilding.name;
+
+    document.getElementById("highestConsumption").textContent =
+        `${highestBuilding.consumption} kWh/day`;
+
     const container = document.getElementById("buildingContainer");
 
     buildings.forEach(building => {
+
         const exceedsLimit = building.consumption > 100;
 
         const status = exceedsLimit
             ? `<div class="warning">
-                   WARNING! Daily consumption exceeds the limit
+                   WARNING! Consumption exceeds the 100 kWh limit
                    by ${building.consumption - 100} kWh.
                </div>`
             : `<div class="normal">
                    Consumption is within the permitted limit.
                </div>`;
+
+        const targetStatus = building.consumption > building.target
+            ? `<p class="target">
+                   Energy-saving target exceeded by
+                   ${building.consumption - building.target} kWh.
+               </p>`
+            : `<p class="target">
+                   Within the energy-saving target.
+               </p>`;
 
         const card = document.createElement("article");
         card.className = "building-card";
@@ -133,6 +210,7 @@
             <p class="target">
                 Energy-Saving Target: ${building.target} kWh/day
             </p>
+            ${targetStatus}
             ${status}
         `;
 
